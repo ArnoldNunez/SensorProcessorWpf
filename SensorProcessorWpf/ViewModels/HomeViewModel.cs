@@ -4,6 +4,7 @@ using OxyPlot;
 using OxyPlot.Axes;
 using OxyPlot.Series;
 using ReactiveUI;
+using SensorProcessorWpf.Models;
 using Splat;
 using System;
 using System.Collections.Generic;
@@ -46,6 +47,8 @@ namespace SensorProcessorWpf.ViewModels
 
         #endregion
 
+        private static ServiceBroker _serviceBroker;
+
         /**
          * Constructor
          */
@@ -79,6 +82,9 @@ namespace SensorProcessorWpf.ViewModels
             //    .Subscribe();
 
             #endregion
+
+            _serviceBroker = new ServiceBroker();
+            _serviceBroker.Start();
         }
 
         /**
