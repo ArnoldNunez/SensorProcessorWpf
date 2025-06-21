@@ -1,0 +1,42 @@
+syntax = "proto3";
+package Communication.Sensors;
+
+option csharp_namespace = "Communication.Sensors";
+
+// Enumeration of the possible sensor types. This is not meant to be an
+// exhaustive list of all sensor types known. This enumeration serves
+// to provide a better experience when interacting with sensors of specific
+// types. For example, allowing for transmission of video stream's FPS or
+// allowing for transmission of GPS satellie count.
+enum SensorType {
+    // Value when the sensor type isn't known or doesn't 
+    // fit any known category.
+    SENSOR_TYPE_UNSPECIFIED = 0;
+
+    // Generic sensor that provides one singular scalar value.
+    SENSOR_TYPE_GENERIC_SCALAR = 1;
+
+    // Generic sensor that provides typical X, Y scalar value
+    // pairs.
+    SENSOR_TYPE_GENERIC_XY = 2;
+
+    // Generic sensor that provides typical X, Y, Z scalar value
+    // pairs.
+    SENSOR_TYPE_GENERIC_XYZ = 3;
+
+    // Standard GPS sensor that can provide global positioning
+    // information.
+    SENSOR_TYPE_GPS = 4;
+
+    // Sensor that provides image data. Use this when using a sensor
+    // that transmits imaging that may not be part of a video stream.
+    SENSOR_TYPE_IMAGING = 5;
+
+    // Sensor that provides video data. Use this when dealing
+    // with a video stream and information about the video stream
+    // properties is known.
+    SENSOR_TYPE_VIDEO = 6;
+
+    // Standar lidar sensor.
+    SENSOR_TYPE_LIDAR = 7;
+}

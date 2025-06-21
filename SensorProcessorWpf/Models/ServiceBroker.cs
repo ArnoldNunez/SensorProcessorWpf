@@ -1,7 +1,10 @@
-﻿using Google.Protobuf;
+﻿using Communication.Sensors;
+using DynamicData.Aggregation;
+using Google.Protobuf;
 using Google.Protobuf.Examples.AddressBoook;
 using NetMQ;
 using NetMQ.Sockets;
+using SensorProcessorWpf.Interfaces;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -12,7 +15,7 @@ using Windows.Media.Protection.PlayReady;
 
 namespace SensorProcessorWpf.Models
 {
-    class ServiceBroker
+    public class ServiceBroker : ISessionMessenger
     {
         /**
          * Thread that handles processing data from the server.
@@ -48,9 +51,21 @@ namespace SensorProcessorWpf.Models
          */
         private static ConcurrentQueue<WorkItem> _workQueue;
 
+        /**
+         * The max number of messages that a single connection will read at
+         * one time. An upper limit exists to avoid starvation of connections.
+         */
+        private static int MAX_MSGS_PER_ITER = 1000;
+
         #region TESTING
 
         private static Timer _timer;
+
+        #endregion
+
+        #region SessionEvents
+
+        public event EventHandler<Person> LoginResponse;
 
         #endregion
 
@@ -61,7 +76,7 @@ namespace SensorProcessorWpf.Models
          */
         public ServiceBroker()
         {
-            _brokerThread = new Thread(this.run);
+            _brokerThread = new Thread(this.runPushTest);
             _brokerThreadSignaler = new ManualResetEvent(false);
             _workQueSignaler = new ManualResetEvent(false);
             _cancellationTokenSource = new CancellationTokenSource();
@@ -112,6 +127,20 @@ namespace SensorProcessorWpf.Models
             _workQueSignaler.Set();
         }
 
+        public void RequestLogin(UserCredentials credentials)
+        {
+            // Convert to protobuf API message
+            AddressBook addressBook = new AddressBook();
+            Person person = new Person
+            {
+                Name = "Tyler",
+                Id = 123,
+                Email = "bangingtest@wtf.com",
+            };
+
+            SendData(person.ToByteArray());
+        }
+
 
         private void run()
         {
@@ -121,7 +150,7 @@ namespace SensorProcessorWpf.Models
             using (var poller = new NetMQPoller())
             {
                 client.ReceiveReady += Client_ReceiveReady;
-                client.Connect("tcp://127.0.0.1:5556");
+                client.Connect("tcp://0.0.0.0:5558");
                 poller.RunAsync();
 
                 while (true)
@@ -154,9 +183,107 @@ namespace SensorProcessorWpf.Models
             }
         }
 
+        private void runPushTest()
+        {
+            _brokerThreadSignaler.WaitOne();
+
+            var timer = new NetMQTimer(TimeSpan.FromSeconds(1));
+            using (var clientReceiver = new PullSocket("@tcp://0.0.0.0:5558"))
+            using (var clientSender = new PushSocket(">tcp://127.0.0.1:5557"))
+            using (var poller = new NetMQPoller() { clientSender, clientReceiver, timer })
+            {
+                clientReceiver.ReceiveReady += (s, a) =>
+                {
+                    System.Diagnostics.Debug.WriteLine("Client ReceiveReady");
+
+                    byte[] msg;
+
+                    for (int count = 0; count < MAX_MSGS_PER_ITER; count++)
+                    {
+                        // Exit the for loop if failed to receive a message
+                        if (!a.Socket.TryReceiveFrameBytes(out msg))
+                        {
+                            break;
+                        }
+
+                        // Process Message
+                        SensorValueScalar sensorValueScalar = SensorValueScalar.Parser.ParseFrom(msg);
+                        //Sensor sensorMsg = Sensor.Parser.ParseFrom(msg);
+                        Console.WriteLine(sensorValueScalar.ToString());
+
+                        // Test triggering event
+                        Person person = new Person() { Name = "John", Email = "johndoe@123.com" };
+                        LoginResponse?.Invoke(this, person);
+
+                        System.Diagnostics.Debug.WriteLine($"ReceiveReady:: messageIn = {sensorValueScalar.ToString()}");
+                    }
+
+                    
+                };
+
+                timer.Elapsed += (s, a) =>
+                {
+                    System.Diagnostics.Debug.WriteLine("Timer elapsed...");
+                };
+
+
+                //poller.RunAsync();
+                poller.Run();
+
+                //while (true)
+                //{
+                //    WaitHandle.WaitAny(
+                //    [
+                //        _cancellationToken.WaitHandle,
+                //        _workQueSignaler
+                //    ]);
+
+                //    // TODO: Start critical section
+
+                //    WorkItem workItem;
+                //    while (!_workQueue.IsEmpty)
+                //    {
+                //        // Todo check cancellation token and break out 
+
+                //        if (_workQueue.TryDequeue(out workItem))
+                //        {
+                //            System.Diagnostics.Debug.WriteLine("ServiceBroker::run() - Sending Frame");
+                //            clientSender.SendFrame(workItem.Data);
+                //        }
+                //    }
+
+                //    // Reset queue signals
+                //    _workQueSignaler.Reset();
+
+                //    // TODO: End critical section
+                //}
+            }
+        }
+
+        private void Timer_Elapsed(object? sender, NetMQTimerEventArgs e)
+        {
+            Console.WriteLine("Timer elapsed...");
+        }
+
         private void Client_ReceiveReady(object? sender, NetMQSocketEventArgs e)
         {
+            Console.WriteLine("Client ReceiveReady");
             //e.Socket.ReceiveMultipartBytes()
+            byte[] msg;
+            for (int count = 0; count < MAX_MSGS_PER_ITER; count++) 
+            {
+                if (!e.Socket.TryReceiveFrameBytes(out msg))
+                {
+                    break;
+                }
+
+                Console.WriteLine("RECEIVED MESSAGE FROM SERVER!");
+
+                // Process Message
+                Sensor sensorMsg = Sensor.Parser.ParseFrom(msg);
+                Console.WriteLine(sensorMsg.ToString());
+                System.Diagnostics.Debug.WriteLine(sensorMsg);
+            } 
         }
 
 

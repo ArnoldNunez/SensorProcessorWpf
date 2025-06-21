@@ -14,7 +14,8 @@
     Background="Teal">
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="1*" />
+            <RowDefinition Height="2*" />
+            <RowDefinition Height="2*"/>
             <RowDefinition Height="1*"/>
         </Grid.RowDefinitions>
 
@@ -26,5 +27,7 @@
 
         <!-- https://svitla.com/blog/wpf-application-with-real-time-data-in-oxyplot-charts/ -->
         <oxy:PlotView x:Name="LiveGraph" Grid.Row="0" Grid.RowSpan="2" />
+
+        <Button x:Name="loginBtn" Grid.Row="2" Content="Login"/>
     </Grid>
 </reactiveui:ReactiveUserControl>

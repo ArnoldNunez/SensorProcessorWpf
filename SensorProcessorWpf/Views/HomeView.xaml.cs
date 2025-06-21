@@ -34,6 +34,9 @@ namespace SensorProcessorWpf.Views
 
                 this.OneWayBind(ViewModel, vm => vm.PlotModel, view => view.LiveGraph.Model)
                     .DisposeWith(disposables);
+
+                this.BindCommand(ViewModel, vm => vm.Login, view => view.loginBtn)
+                    .DisposeWith(disposables);
             });
         }
     }

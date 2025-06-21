@@ -1,0 +1,27 @@
+
+syntax = "proto3";
+package Communication.Sensors;
+
+import "google/protobuf/timestamp.proto";
+
+import "SensorType.proto";
+
+option csharp_namespace = "Communication.Sensors";
+
+// Message representing a Sensor. Contains basic info about
+// a sensor in the system.
+message Sensor {
+	string name = 1;			// Name of the Sensor
+	int32 id = 2;				// Unique ID number for this sensor
+	string description = 3; 	// Description given to the sensor
+	SensorType type = 4;		// Categorization of the type of sensor
+}
+
+
+// Message represnting a scalar based sensor value. Contains
+// one reading from the sensor.
+message SensorValueScalar {
+	int32 sensorId = 1;						// Id of the sensor this value is for
+	repeated float values = 2;				// The value(s) from the reading
+	google.protobuf.Timestamp timestamp = 3;	// The timestamp of the reading
+}

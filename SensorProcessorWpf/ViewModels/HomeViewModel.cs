@@ -10,6 +10,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Reactive;
 using System.Reactive.Linq;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
@@ -48,6 +49,19 @@ namespace SensorProcessorWpf.ViewModels
         #endregion
 
         private static ServiceBroker _serviceBroker;
+        private static SessionService _sessionService;
+
+
+        #region Commands
+
+        /**
+         * Command to login to server application
+         */
+        public ReactiveCommand<Unit, Unit> Login { get; private set; }
+        private readonly ObservableAsPropertyHelper<bool> _isLoginInProgress;
+        public bool isLoginInProgress { get { return _isLoginInProgress.Value; } }
+
+        #endregion
 
         /**
          * Constructor
@@ -83,7 +97,16 @@ namespace SensorProcessorWpf.ViewModels
 
             #endregion
 
+            #region COMMANDS
+
+            //Login = ReactiveCommand.CreateFromObservable(LoginImplementation);
+            //Login.IsExecuting.ToProperty(this, x => x.isLoginInProgress, out _isLoginInProgress);
+            //Login.ThrownExceptions.Subscribe(ex => this.Log().Error("Something went wrong", ex));
+
+            #endregion
+
             _serviceBroker = new ServiceBroker();
+            _sessionService = new SessionService(_serviceBroker);
             _serviceBroker.Start();
         }
 
@@ -120,6 +143,34 @@ namespace SensorProcessorWpf.ViewModels
 
             this.PlotModel.InvalidatePlot(true);
         }
+
+        #region CommandHandlers6
+
+        /**
+         * Login Command Handler. Will attempt to login to the remote server
+         */
+        public IObservable<Unit> LoginImplementation(string username, string password)
+        {
+            return Observable.Start(() =>
+            {
+                UserCredentials credentials = new UserCredentials
+                {
+                    UserId = username,
+                    Username = username,
+                    Accepted = false
+                };
+
+                UserCredentials result = _sessionService.Login(credentials).Result;
+
+                if (result != null && result.Accepted)
+                {
+                    System.Diagnostics.Debug.WriteLine("HomeViewModel::Login Accepted!");
+                }
+            });
+        }
+
+
+        #endregion
     }
 
     //public class Sensor
