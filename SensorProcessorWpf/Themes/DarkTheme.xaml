@@ -4,20 +4,23 @@
     xmlns:local="clr-namespace:SensorProcessorWpf">
     
     <!-- Color Definitions -->
-    <Color x:Key="DarkBackgroundColor">#181d27</Color>
-    <Color x:Key="DarkForegroundColor">#FFFFFF</Color>
-    <Color x:Key="DarkAccentColor">#f3dfc1</Color>
+    <Color x:Key="DarkBackgroundColor">#222222</Color>
+    <Color x:Key="DarkForegroundColor">#333333</Color>
+    <Color x:Key="DarkAccentColor">#1BA1E2</Color>
     <Color x:Key="DarkButtonBackgroundColor">#333333</Color>
     <Color x:Key="DarkButtonHoverBackgroundColor">#444444</Color>
+    <Color x:Key="DarkTextColor">#FFFFFF</Color>
+    <Color x:Key="DarkErrorTextColor">#EA6B66</Color>
 
-	<SolidColorBrush x:Key="DarkBackgroundColorBrush" Color="{StaticResource DarkBackgroundColor}" />
+    <SolidColorBrush x:Key="DarkBackgroundColorBrush" Color="{StaticResource DarkBackgroundColor}" />
 	<SolidColorBrush x:Key="DarkForegroundColorBrush" Color="{StaticResource DarkForegroundColor}" />
 	<SolidColorBrush x:Key="DarkAccentColorBrush" Color="{StaticResource DarkAccentColor}" />
 	<SolidColorBrush x:Key="DarkButtonBackgroundColorBrush" Color="{StaticResource DarkButtonBackgroundColor}"/>
 	<SolidColorBrush x:Key="DarkButtonHoverBackgroundColorBrush" Color="{StaticResource DarkButtonHoverBackgroundColor}" />
+    <SolidColorBrush x:Key="DarkTextColorBrush" Color="{StaticResource DarkTextColor}" />
+    <SolidColorBrush x:Key="DarkErrorTextColorBrush" Color="{StaticResource DarkErrorTextColor}" />
 
-
-	<!-- Styles -->
+    <!-- Styles -->
     <Style x:Key="WindowStyle" TargetType="{x:Type Window}">
         <Setter Property="Background" Value="{StaticResource DarkBackgroundColorBrush}"/>
         <Setter Property="Foreground" Value="{StaticResource DarkForegroundColorBrush}"/>
@@ -25,29 +28,33 @@
 
 	<Style TargetType="Button">
 		<Setter Property="Background" Value="{StaticResource DarkBackgroundColorBrush}"/>
-		<Setter Property="Foreground" Value="{StaticResource DarkForegroundColorBrush}"/>
-		<!--<Setter Property="BorderBrush" Value="Transparent"/>-->
+        <Setter Property="Foreground" Value="{StaticResource DarkTextColorBrush}"/>
+        <!--<Setter Property="BorderBrush" Value="Transparent"/>-->
 
-		<Setter Property="Template">
-			<Setter.Value>
-				<ControlTemplate TargetType="Button">
-					
-					<Border Name="border" BorderThickness="1" Padding="4,2"
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+
+                    <Border Name="border" BorderThickness="1" Padding="4,2"
                         BorderBrush="Transparent" CornerRadius="3"
                         Background="{TemplateBinding Background}">
-						<ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
-					</Border>
-					
-					<ControlTemplate.Triggers>
-						<Trigger Property="IsMouseOver" Value="True">
-							<Setter TargetName="border" Property="BorderBrush" Value="{StaticResource DarkAccentColorBrush}" />
-							<!-- <Setter Property="Background" Value="DarkGoldenrod" /> -->
-						</Trigger>
-					</ControlTemplate.Triggers>
-				</ControlTemplate>
-			</Setter.Value>
-		</Setter>
+                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                    </Border>
 
-	</Style>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="border" Property="BorderBrush" Value="{StaticResource DarkAccentColorBrush}" />
+                            <!-- <Setter Property="Background" Value="DarkGoldenrod" /> -->
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style TargetType="ListBoxItem">
+        <Setter Property="Margin" Value="0" />
+        <Setter Property="Padding" Value="0" />
+    </Style>
 
 </ResourceDictionary>

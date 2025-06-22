@@ -1,0 +1,26 @@
+﻿<reactiveui:ReactiveUserControl x:Class="SensorProcessorWpf.Views.NavigationBar"
+                                x:TypeArguments="vms:NavigationBarViewModel"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:SensorProcessorWpf.Views"
+             xmlns:reactiveui="http://reactiveui.net"
+             xmlns:vms="clr-namespace:SensorProcessorWpf.ViewModels"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="50">
+    <ListBox x:Name="navigationBar" SelectionMode="Single" 
+             Background="{StaticResource DarkBackgroundColorBrush}"
+             HorizontalContentAlignment="Stretch"
+             BorderBrush="Black"
+             BorderThickness="0">
+        
+        <Button x:Name="homeBtn" 
+                Content="H" Height="40" Padding="0" Margin="0"/>
+        <Button x:Name="experimentsBtn"
+                Content="E" Height="40"/>
+        <Button x:Name="liveViewBtn"
+                Content="L" Height="40"/>
+    </ListBox>
+    
+</reactiveui:ReactiveUserControl>
