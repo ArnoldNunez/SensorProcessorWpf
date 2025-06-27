@@ -13,14 +13,19 @@ namespace SensorProcessorWpf.Models
     public class UserCredentials
     {
         /**
+         * Unique Id of the user.
+         */
+        public string UserId { get; set; }
+
+        /**
          * Username belonging to the user.
          */
         public string Username { get; set; }
 
         /**
-         * Unique Id of the user.
+         * User password
          */
-        public string UserId { get; set; }
+        public string Password { get; set; }
 
         /**
          * Flag indicating whether the user credentials are accepted.

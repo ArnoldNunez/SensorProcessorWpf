@@ -1,8 +1,10 @@
 ﻿using ReactiveUI;
 using SensorProcessorWpf.ViewModels;
+using Splat;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reactive.Disposables;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -26,6 +28,23 @@ namespace SensorProcessorWpf.Views
         {
             InitializeComponent();
 
+            this.WhenActivated(disposables =>
+            {
+                this.Bind(ViewModel, vm => vm.Username, view => view.username.Text)
+                    .DisposeWith(disposables);
+            });
+        }
+
+        /**
+         * Password box doesn't support bindings by default. This callback will handle
+         * updating the viewmodel.
+         */
+        private void password_PasswordChanged(object sender, RoutedEventArgs e)
+        {
+            if (this.ViewModel != null)
+            {
+                this.ViewModel.Password = password.Password;
+            }
         }
     }
 }
