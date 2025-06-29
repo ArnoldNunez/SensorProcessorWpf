@@ -55,6 +55,10 @@
                    Content="Invalid Credentials!"
                    Foreground="{StaticResource DarkErrorTextColorBrush}"/>
         </Grid>
-        
+
+        <StackPanel Grid.Row="2" VerticalAlignment="Bottom" Orientation="Horizontal" FlowDirection="RightToLeft"
+                    MinHeight="50" Margin="15 0 15 10" >
+            <Button x:Name="loginBtn" Content="Login" MinWidth="80" Margin="0 0 0 0" Style="{StaticResource standardButton}" />
+        </StackPanel>
     </Grid>
 </reactiveui:ReactiveUserControl>

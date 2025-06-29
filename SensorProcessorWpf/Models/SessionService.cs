@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SensorProcessorWpf.Interfaces;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -11,7 +12,7 @@ namespace SensorProcessorWpf.Models
      * Session service that handles establishing and tearing down
      * a client/server session.
      */
-    public class SessionService : Microservice
+    public class SessionService : Microservice, ISessionService
     {
         /**
          * Task completion source for when a response to a login command is received.
@@ -34,18 +35,14 @@ namespace SensorProcessorWpf.Models
         /**
          * Login to the server.
          */
-        public Task<UserCredentials> Login(UserCredentials credentials)
+        public Task<UserCredentials> Login(UserCredentials credentials, int timeout = 3000)
         {
-            // TODO: Read from message queue on worker thread. Worker thread
-            // performs task of reading response, task returns result which is
-            // response. Calling thread waits on async, time out needs to be avail
-            // to prevent starvation.
-            if (_loginTCS == null || _loginTCS.Task.IsCompleted)
-            {
-                System.Diagnostics.Debug.WriteLine("SessionService::Login - Running login task.");
-                _loginTCS = new TaskCompletionSource<UserCredentials>(TaskCreationOptions.RunContinuationsAsynchronously);
-                return _loginTCS.Task;
-            }
+            //if (_loginTCS == null || _loginTCS.Task.IsCompleted)
+            //{
+            //    System.Diagnostics.Debug.WriteLine("SessionService::Login - Running login task.");
+            //    _loginTCS = new TaskCompletionSource<UserCredentials>(TaskCreationOptions.RunContinuationsAsynchronously);
+            //    return _loginTCS.Task;
+            //}
 
             UserCredentials response = new UserCredentials();
             response.Username = credentials.Username;

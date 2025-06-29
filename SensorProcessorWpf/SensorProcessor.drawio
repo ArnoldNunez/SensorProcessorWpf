@@ -1,4 +1,4 @@
-<mxfile host="Electron" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/26.2.2 Chrome/134.0.6998.178 Electron/35.1.2 Safari/537.36" version="26.2.2" pages="2">
+<mxfile host="Electron" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/27.0.9 Chrome/134.0.6998.205 Electron/35.4.0 Safari/537.36" version="27.0.9" pages="2">
   <diagram name="Page-1" id="ESQQdq1TttOkJcOgB4Id">
     <mxGraphModel dx="1019" dy="803" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
       <root>
@@ -240,7 +240,7 @@
     </mxGraphModel>
   </diagram>
   <diagram id="UIBWTq_sI-04LLZBJN7o" name="UI Mocks">
-    <mxGraphModel dx="1019" dy="803" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+    <mxGraphModel dx="812" dy="698" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -511,10 +511,10 @@
         <mxCell id="Afbs1VhR4uwAlz6h4NSO-107" value="&lt;font style=&quot;color: rgb(255, 255, 255);&quot;&gt;1.43 TB / 20.22 TB&lt;/font&gt;" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontFamily=Verdana;" parent="1" vertex="1">
           <mxGeometry x="315" y="1380" width="140" height="30" as="geometry" />
         </mxCell>
-        <mxCell id="uqqB3vQS64TV4XhPBrB8-1" value="&lt;font style=&quot;color: rgb(234, 107, 102);&quot;&gt;Invalid Crendentials!&lt;/font&gt;" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontFamily=Verdana;" vertex="1" parent="1">
+        <mxCell id="uqqB3vQS64TV4XhPBrB8-1" value="&lt;font style=&quot;color: rgb(234, 107, 102);&quot;&gt;Invalid Crendentials!&lt;/font&gt;" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontFamily=Verdana;" parent="1" vertex="1">
           <mxGeometry x="752" y="940" width="150" height="30" as="geometry" />
         </mxCell>
-        <mxCell id="uqqB3vQS64TV4XhPBrB8-2" value="EA6B66" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" vertex="1" parent="1">
+        <mxCell id="uqqB3vQS64TV4XhPBrB8-2" value="EA6B66" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" parent="1" vertex="1">
           <mxGeometry x="765" y="918" width="70" height="30" as="geometry" />
         </mxCell>
       </root>

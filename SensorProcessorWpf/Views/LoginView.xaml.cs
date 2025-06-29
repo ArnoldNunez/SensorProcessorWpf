@@ -32,6 +32,16 @@ namespace SensorProcessorWpf.Views
             {
                 this.Bind(ViewModel, vm => vm.Username, view => view.username.Text)
                     .DisposeWith(disposables);
+
+                this.BindCommand(ViewModel,
+                    viewModel => viewModel.Login,
+                    view => view.loginBtn)
+                    .DisposeWith(disposables);
+
+                this.OneWayBind(ViewModel,
+                    vm => vm.LoginErrorMsg,
+                    view => view.loginErrorTxt.Content)
+                    .DisposeWith(disposables);
             });
         }
 

@@ -48,9 +48,6 @@ namespace SensorProcessorWpf.ViewModels
 
         #endregion
 
-        private static ServiceBroker _serviceBroker;
-        private static SessionService _sessionService;
-
 
         #region Commands
 
@@ -104,10 +101,6 @@ namespace SensorProcessorWpf.ViewModels
             //Login.ThrownExceptions.Subscribe(ex => this.Log().Error("Something went wrong", ex));
 
             #endregion
-
-            _serviceBroker = new ServiceBroker();
-            _sessionService = new SessionService(_serviceBroker);
-            _serviceBroker.Start();
         }
 
         /**
@@ -143,34 +136,6 @@ namespace SensorProcessorWpf.ViewModels
 
             this.PlotModel.InvalidatePlot(true);
         }
-
-        #region CommandHandlers6
-
-        /**
-         * Login Command Handler. Will attempt to login to the remote server
-         */
-        public IObservable<Unit> LoginImplementation(string username, string password)
-        {
-            return Observable.Start(() =>
-            {
-                UserCredentials credentials = new UserCredentials
-                {
-                    UserId = username,
-                    Username = username,
-                    Accepted = false
-                };
-
-                UserCredentials result = _sessionService.Login(credentials).Result;
-
-                if (result != null && result.Accepted)
-                {
-                    System.Diagnostics.Debug.WriteLine("HomeViewModel::Login Accepted!");
-                }
-            });
-        }
-
-
-        #endregion
     }
 
     //public class Sensor

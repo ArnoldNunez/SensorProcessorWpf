@@ -7,6 +7,7 @@
     <Color x:Key="DarkBackgroundColor">#222222</Color>
     <Color x:Key="DarkForegroundColor">#333333</Color>
     <Color x:Key="DarkAccentColor">#1BA1E2</Color>
+    <Color x:Key="DarkAccentColorAction">#33FF33</Color>
     <Color x:Key="DarkButtonBackgroundColor">#333333</Color>
     <Color x:Key="DarkButtonHoverBackgroundColor">#444444</Color>
     <Color x:Key="DarkTextColor">#FFFFFF</Color>
@@ -15,6 +16,7 @@
     <SolidColorBrush x:Key="DarkBackgroundColorBrush" Color="{StaticResource DarkBackgroundColor}" />
 	<SolidColorBrush x:Key="DarkForegroundColorBrush" Color="{StaticResource DarkForegroundColor}" />
 	<SolidColorBrush x:Key="DarkAccentColorBrush" Color="{StaticResource DarkAccentColor}" />
+    <SolidColorBrush x:Key="DarkAccentColorActionBrush" Color="{StaticResource DarkAccentColorAction}" />
 	<SolidColorBrush x:Key="DarkButtonBackgroundColorBrush" Color="{StaticResource DarkButtonBackgroundColor}"/>
 	<SolidColorBrush x:Key="DarkButtonHoverBackgroundColorBrush" Color="{StaticResource DarkButtonHoverBackgroundColor}" />
     <SolidColorBrush x:Key="DarkTextColorBrush" Color="{StaticResource DarkTextColor}" />
@@ -51,6 +53,37 @@
             </Setter.Value>
         </Setter>
     </Style>
+
+    <Style TargetType="Button" x:Key="standardButton">
+        <Setter Property="Background" Value="{StaticResource DarkForegroundColorBrush}"/>
+        <Setter Property="Foreground" Value="{StaticResource DarkTextColorBrush}"/>
+        <!--<Setter Property="BorderBrush" Value="Transparent"/>-->
+
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+
+                    <Border Name="border" BorderThickness="1" Padding="4,2"
+                        BorderBrush="Transparent" CornerRadius="3"
+                        Background="{TemplateBinding Background}">
+                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                    </Border>
+
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="border" Property="BorderBrush" Value="{StaticResource DarkAccentColorBrush}" />
+                            <!-- <Setter Property="Background" Value="DarkGoldenrod" /> -->
+                        </Trigger>
+
+                        <Trigger Property="IsPressed" Value="True">
+                            <Setter TargetName="border" Property="BorderBrush" Value="{StaticResource DarkAccentColorActionBrush}" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
 
     <Style TargetType="ListBoxItem">
         <Setter Property="Margin" Value="0" />

@@ -1,9 +1,11 @@
 ﻿using ReactiveUI;
+using SensorProcessorWpf.Interfaces;
 using SensorProcessorWpf.Models;
 using Splat;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reactive;
 using System.Reactive.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -12,6 +14,16 @@ namespace SensorProcessorWpf.ViewModels
 {
     public class LoginViewModel : ReactiveObject, IRoutableViewModel
     {
+        #region SESSION
+
+        /**
+         * The session service handling session related tasks.
+         */
+        private readonly ISessionService sessionService;
+
+
+        #endregion
+
         #region PAGE NAVIGATION
 
         /**
@@ -24,6 +36,8 @@ namespace SensorProcessorWpf.ViewModels
          * Typically contains the instance of the host screen.
          */
         public IScreen HostScreen { get; }
+
+
 
         #endregion
 
@@ -43,25 +57,37 @@ namespace SensorProcessorWpf.ViewModels
             set => this.RaiseAndSetIfChanged(ref password, value);
         }
 
-        private readonly ObservableAsPropertyHelper<UserCredentials> credentials;
+        private readonly ObservableAsPropertyHelper<string> loginErrorMsg;
+        public string LoginErrorMsg => loginErrorMsg.Value;
 
+
+        private readonly ObservableAsPropertyHelper<UserCredentials> credentials;
         public UserCredentials Credentials => credentials.Value;
+
+
+        /**
+         * Command executed when user attempts to login
+         */
+        public ReactiveCommand<Unit, string> Login { get; }
+
 
 
         /**
          * Cosntructor
          */
-        public LoginViewModel(IScreen screen = null)
+        public LoginViewModel(IScreen screen = null, ISessionService sessionService = null)
         {
+            #region DEPENDENCIES
+
+            this.sessionService = sessionService ?? Locator.Current.GetService<ISessionService>();
+
+            #endregion
+
             #region PAGE NAVIGATION
 
             HostScreen = screen ?? Locator.Current.GetService<IScreen>();
 
             #endregion
-
-            // Get an observable from the Username property. The observable reacts
-            // to changes from the Username property.
-            IObservable<string> usernameObs = this.WhenAnyValue(x => x.Username);
 
             // When any of the username or password fields changes, update the stored
             // user credentials property.
@@ -76,6 +102,33 @@ namespace SensorProcessorWpf.ViewModels
             {
                 System.Diagnostics.Debug.WriteLine($"Credentials: {x.Username}:{x.Password}:{x.Accepted}");
             });
+
+            var canLogin = this.WhenAnyValue(x => x.Username, x => x.Password,
+                (u, p) => !string.IsNullOrWhiteSpace(u) &&  !string.IsNullOrWhiteSpace(p));
+            Login = ReactiveCommand.CreateFromTask(LoginAsync, canLogin);
+            Login.Subscribe(_ => { System.Diagnostics.Debug.WriteLine("Login Command Finished!"); });
+            loginErrorMsg = Login.ToProperty(this, x => x.LoginErrorMsg);
+        }
+
+
+
+        /**
+         * Login command work.
+         */
+        private async Task<string> LoginAsync()
+        {
+            System.Diagnostics.Debug.WriteLine("LoginViewModel::LoginAsync");
+
+            UserCredentials result = await sessionService.Login(credentials.Value, 3000);
+
+            if (result.Accepted)
+            {
+                return "Login Success!";
+            }
+            else
+            {
+                return "Login Failed!";
+            }
         }
     }
 }
