@@ -21,6 +21,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="generated\" />
     <Folder Include="Themes\" />
   </ItemGroup>
 

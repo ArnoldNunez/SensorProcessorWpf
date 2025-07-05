@@ -1,2 +1,7 @@
-@rem protoc-30.2-win64/bin/protoc.exe -I=protos --csharp_out=protos protos/addressbook.proto
-"protoc-30.2-win64/bin/protoc.exe" -I=protos --csharp_out=protos protos/*.proto
+@rem
+@rem Script to compile the project proto files.
+@rem
+
+if not exist "generated" md "generated"
+
+protoc -I=protos --csharp_out=generated protos/*.proto protos/DiagnosticsService/*.proto protos/SessionService/*.proto

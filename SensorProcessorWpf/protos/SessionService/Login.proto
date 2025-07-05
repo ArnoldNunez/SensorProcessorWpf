@@ -1,0 +1,58 @@
+
+syntax = "proto3";
+package CoreServices;
+
+import "google/protobuf/timestamp.proto";
+
+option csharp_namespace = "CoreServices";
+
+/**
+ * Login request Message.
+ */
+message LoginRequest {
+    // The username for the login request
+    string username = 1;
+
+    // The password for the login request
+    string password = 2;
+
+    // Timetamp of the request
+    google.protobuf.Timestamp timestamp = 3;
+}
+
+/**
+ * Login response.
+ */
+message LoginResponse {
+    // Username tied to the login request.
+    string username = 1;
+
+    // Status of the request.
+    LoginStatus result = 2;
+
+    // Unique identifier for the session.
+    int32 sessionId = 3;
+}
+
+/**
+ * Enumeration of the possible login request statuses.
+ */
+enum LoginStatus {
+    // Unknown
+    LOGIN_STATUS_UNKNOWN = 0;
+
+    // Logged into system
+    LOGIN_STATUS_LOGGED_IN = 1;
+
+    // Logged out from system.
+    LOGIN_STATUS_LOGGED_OUT = 2;
+
+    // Login involved unauthorized credentials.
+    LOGIN_STATUS_UNAUTHORIZED = 3;
+
+    // Login attempt timed out.
+    LOGIN_STATUS_TIMED_OUT = 4;
+
+    // Network related issues prevented login.
+    LOGIN_STATUS_NETWORK_ERROR = 5;
+}

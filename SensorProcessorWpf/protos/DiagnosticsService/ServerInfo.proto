@@ -1,0 +1,68 @@
+
+syntax = "proto3";
+package CoreServices;
+
+option csharp_namespace = "CoreServices";
+
+/**
+ * Login request Message.
+ */
+message ServerSpecs {
+    // Name of the machine the server is running on.
+    string machineName = 1;
+
+    // Operating system the server is running on.
+    string operatingSystem = 2;
+
+    // Cpu Specs
+    CpuSpecs cpuSpecs = 3;
+
+    // Storage specs
+    StorageSpecs storageSpecs = 4;
+}
+
+/**
+ * Message containing the specs of the CPU.
+ */
+message CpuSpecs {
+    // Number of cores on the CPU
+    uint32 cores = 1;
+
+    // Number of threads per CPU core
+    uint32 threadsPerCore = 2;
+
+    // Max frequency (MHz)
+    uint32 maxFreq = 3;
+
+    // Min frequency (MHz)
+    uint32 minFreq = 4;
+
+    // Byte order of the cpu
+    //ByteOrder byteOrder = 5;
+
+    // CPU model name
+    string model = 6;
+
+    // Vendor of the cpu
+    string vendor = 7;
+}
+
+/**
+ * Message contianing storage specs of the machine.
+ */
+message StorageSpecs {
+    // The total space on the machine (GB)
+    uint32 totalSpace = 1;
+
+    // The used space on the machine (GB)
+    uint32 usedSpace = 2;
+}
+
+/**
+* Enumeration of the CPU byte orders.
+*/
+enum ByteOrder {
+    BYTE_ORDER_UNKNOWN = 0;
+    BYTE_ORDER_LITTLE_ENDIAN = 1;
+    BYTE_ORDER_BIG_ENDIAN = 2;
+}

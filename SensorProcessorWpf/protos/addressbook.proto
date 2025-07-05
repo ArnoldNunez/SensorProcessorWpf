@@ -7,7 +7,6 @@ option csharp_namespace = "Google.Protobuf.Examples.AddressBoook";
 
 // Message declarations //
 
-
 message Person {
 	string name = 1;	// Name of the person
 	int32 id = 2;		// Unique ID number for this person

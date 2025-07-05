@@ -1,0 +1,66 @@
+
+syntax = "proto3";
+package CoreServices;
+
+//import "DiagnosticsService/ServerInfo.proto";
+import "SessionService/Login.proto";
+//import "Sensor.proto";
+
+option csharp_namespace = "CoreServices";
+
+/*
+ * Enumeration of the core command ids.
+ */
+enum CORE_COMMAND_ID {
+    COMMAND_ID_LOGIN_REQUEST = 0;
+}
+
+/**
+ * Enumeration of the core response ids.
+ */
+enum CORE_RESPONSE_ID {
+    RESPONSE_ID_LOGIN_RESPONSE = 0;
+}
+
+/**
+ * Enumeration of the core status ids. 
+ */
+enum CORE_STATUS_ID {
+    STATUS_ID_SENSOR_VALUE_SCALAR = 0;
+}
+
+/**
+ * Top level command message. Encapsulates command based
+ * messages.
+ */
+message Command {
+    /**
+     * Unique identifier for the command payload.
+     */
+    CORE_COMMAND_ID commandId = 1;
+
+    /**
+     * The actual payload of the message.
+     */
+    oneof payload {
+        LoginRequest loginRequest = 10;
+    }
+}
+
+/**
+ * Top level response message. Encapsulates response based
+ * messages.
+ */
+message Response {
+    /**
+     * Unique identifier for the response payload.
+     */
+    CORE_RESPONSE_ID responseId = 1;
+
+    /**
+     * The actual payload of the message.
+     */
+    oneof payload {
+        LoginResponse loginResponse = 10;
+    }
+}
