@@ -17,7 +17,7 @@ namespace SensorProcessorWpf.Models
         /**
          * Task completion source for when a response to a login command is received.
          */
-        private TaskCompletionSource<UserCredentials> _loginTCS;
+        private TaskCompletionSource<CoreServices.LoginResponse> _loginTCS;
 
         /**
          * Timeout for when login should be considered to have failed. (ms)
@@ -35,19 +35,23 @@ namespace SensorProcessorWpf.Models
         /**
          * Login to the server.
          */
-        public Task<UserCredentials> Login(UserCredentials credentials, int timeout = 3000)
+        public Task<CoreServices.LoginResponse> Login(UserCredentials credentials, int timeout = 3000)
         {
-            //if (_loginTCS == null || _loginTCS.Task.IsCompleted)
-            //{
-            //    System.Diagnostics.Debug.WriteLine("SessionService::Login - Running login task.");
-            //    _loginTCS = new TaskCompletionSource<UserCredentials>(TaskCreationOptions.RunContinuationsAsynchronously);
-            //    return _loginTCS.Task;
-            //}
+            if (_loginTCS == null || _loginTCS.Task.IsCompleted)
+            {
+                System.Diagnostics.Debug.WriteLine("SessionService::Login - Running login task.");
+                ServiceBroker.RequestLogin(credentials);
+                _loginTCS = new TaskCompletionSource<CoreServices.LoginResponse>(TaskCreationOptions.RunContinuationsAsynchronously);
+                
+                return _loginTCS.Task;
+            }
 
-            UserCredentials response = new UserCredentials();
-            response.Username = credentials.Username;
-            response.UserId = credentials.UserId;
-            response.Accepted = false;
+            CoreServices.LoginResponse response = new CoreServices.LoginResponse
+            {
+                Result = CoreServices.LoginStatus.Unknown,
+                SessionId = -1,
+                Username = credentials.Username,
+            };
 
             return Task.FromResult(response);
         }
@@ -57,20 +61,11 @@ namespace SensorProcessorWpf.Models
         /**
          * Callback for the login response.
          */
-        private void ServiceBroker_LoginResponse(object? sender, Google.Protobuf.Examples.AddressBoook.Person e)
+        private void ServiceBroker_LoginResponse(object? sender, CoreServices.LoginResponse e)
         {
-            if (e == null)
-            {
-                System.Diagnostics.Debug.WriteLine("SessionService::ServiceBroker_LoginResponse - returned response is null");
-                return;
-            }
-
-            System.Diagnostics.Debug.WriteLine($"SessionService::ServiceBroker_LoginResponse - Got valid Ack!: {e.ToString()}");
-
             if (_loginTCS != null)
             {
-                UserCredentials userCredentials = new UserCredentials() { UserId = e.Id.ToString(), Username = e.Email, Accepted = true};
-                _loginTCS.TrySetResult(userCredentials);
+                _loginTCS.TrySetResult(e);
             }
         }
 

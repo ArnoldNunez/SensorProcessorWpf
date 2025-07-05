@@ -16,6 +16,6 @@ namespace SensorProcessorWpf.Interfaces
         /**
          * Method to let the user login to the processing server.
          */
-        public Task<UserCredentials> Login(UserCredentials credentials, int timeout);
+        public Task<CoreServices.LoginResponse> Login(UserCredentials credentials, int timeout);
     }
 }

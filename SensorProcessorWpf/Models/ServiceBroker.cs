@@ -2,6 +2,7 @@
 using DynamicData.Aggregation;
 using Google.Protobuf;
 using Google.Protobuf.Examples.AddressBoook;
+using Google.Protobuf.WellKnownTypes;
 using NetMQ;
 using NetMQ.Sockets;
 using SensorProcessorWpf.Interfaces;
@@ -52,6 +53,11 @@ namespace SensorProcessorWpf.Models
         private static ConcurrentQueue<WorkItem> _workQueue;
 
         /**
+         * Thread syncronization primitive for the work queue.
+         */
+        private readonly Object _workQueueLock = new object();
+
+        /**
          * The max number of messages that a single connection will read at
          * one time. An upper limit exists to avoid starvation of connections.
          */
@@ -65,7 +71,7 @@ namespace SensorProcessorWpf.Models
 
         #region SessionEvents
 
-        public event EventHandler<Person> LoginResponse;
+        public event EventHandler<CoreServices.LoginResponse> LoginResponse;
 
         #endregion
 
@@ -76,7 +82,7 @@ namespace SensorProcessorWpf.Models
          */
         public ServiceBroker()
         {
-            _brokerThread = new Thread(this.runPushTest);
+            _brokerThread = new Thread(this.run);
             _brokerThreadSignaler = new ManualResetEvent(false);
             _workQueSignaler = new ManualResetEvent(false);
             _cancellationTokenSource = new CancellationTokenSource();
@@ -85,22 +91,22 @@ namespace SensorProcessorWpf.Models
 
             #region TESTING
 
-            _timer = new Timer(_ =>
-            {
-                // Read from the send queue until interrupted.
-                AddressBook addressBook = new AddressBook();
-                Person person = new Person
-                {
-                    Name = "Tyler",
-                    Id = 123,
-                    Email = "bangingtest@wtf.com",
-                };
-                //= { Seconds = DateTime.UtcNow.Second, Nanos = DateTime.UtcNow.Nanosecond }
+            //_timer = new Timer(_ =>
+            //{
+            //    // Read from the send queue until interrupted.
+            //    AddressBook addressBook = new AddressBook();
+            //    Person person = new Person
+            //    {
+            //        Name = "Tyler",
+            //        Id = 123,
+            //        Email = "bangingtest@wtf.com",
+            //    };
+            //    //= { Seconds = DateTime.UtcNow.Second, Nanos = DateTime.UtcNow.Nanosecond }
 
-                System.Diagnostics.Debug.WriteLine("ServiceBroker::run() - Enqueing data: " + person.ToString());
-                SendData(person.ToByteArray());
+            //    System.Diagnostics.Debug.WriteLine("ServiceBroker::run() - Enqueing data: " + person.ToString());
+            //    SendData(person.ToByteArray());
 
-            }, null, 0, 3000);
+            //}, null, 0, 3000);
 
             #endregion
 
@@ -123,67 +129,31 @@ namespace SensorProcessorWpf.Models
         {
             WorkItem workItem = new WorkItem { Data = data };
 
-            _workQueue.Enqueue(workItem);
-            _workQueSignaler.Set();
+            lock(_workQueueLock)
+            {
+                _workQueue.Enqueue(workItem);
+                _workQueSignaler.Set();
+            }
         }
 
         public void RequestLogin(UserCredentials credentials)
         {
             // Convert to protobuf API message
-            AddressBook addressBook = new AddressBook();
-            Person person = new Person
+            CoreServices.Command request = new CoreServices.Command
             {
-                Name = "Tyler",
-                Id = 123,
-                Email = "bangingtest@wtf.com",
+                CommandId = CoreServices.CORE_COMMAND_ID.CommandIdLoginRequest,
+                LoginRequest = new CoreServices.LoginRequest
+                {
+                    Username = credentials.Username,
+                    Password = credentials.Password,
+                    Timestamp = Timestamp.FromDateTime(DateTime.UnixEpoch)
+                }
             };
 
-            SendData(person.ToByteArray());
+            SendData(request.ToByteArray());
         }
-
 
         private void run()
-        {
-            _brokerThreadSignaler.WaitOne();
-
-            using (var client = new DealerSocket())
-            using (var poller = new NetMQPoller())
-            {
-                client.ReceiveReady += Client_ReceiveReady;
-                client.Connect("tcp://0.0.0.0:5558");
-                poller.RunAsync();
-
-                while (true)
-                {
-                    WaitHandle.WaitAny(
-                    [
-                        _cancellationToken.WaitHandle,
-                        _workQueSignaler
-                    ]);
-
-                    // TODO: Start critical section
-
-                    WorkItem workItem;
-                    while (!_workQueue.IsEmpty)
-                    {
-                        // Todo check cancellation token and break out 
-
-                        if (_workQueue.TryDequeue(out workItem))
-                        {
-                            System.Diagnostics.Debug.WriteLine("ServiceBroker::run() - Sending Frame");
-                            client.SendFrame(workItem.Data);
-                        }
-                    }
-
-                    // Reset queue signals
-                    _workQueSignaler.Reset();
-
-                    // TODO: End critical section
-                }
-            }
-        }
-
-        private void runPushTest()
         {
             _brokerThreadSignaler.WaitOne();
 
@@ -206,19 +176,23 @@ namespace SensorProcessorWpf.Models
                             break;
                         }
 
-                        // Process Message
-                        SensorValueScalar sensorValueScalar = SensorValueScalar.Parser.ParseFrom(msg);
-                        //Sensor sensorMsg = Sensor.Parser.ParseFrom(msg);
-                        Console.WriteLine(sensorValueScalar.ToString());
+                        string logStr = "ReceiveRead:: messageIn: ";
+                            CoreServices.Response response = CoreServices.Response.Parser.ParseFrom(msg);
+                        if (response != null)
+                        {
+                            switch (response.ResponseId)
+                            {
+                                case CoreServices.CORE_RESPONSE_ID.ResponseIdLoginResponse:
+                                    logStr += "Login Response";
+                                    this.LoginResponse?.Invoke(this, response.LoginResponse);
+                                    break;
 
-                        // Test triggering event
-                        Person person = new Person() { Name = "John", Email = "johndoe@123.com" };
-                        LoginResponse?.Invoke(this, person);
-
-                        System.Diagnostics.Debug.WriteLine($"ReceiveReady:: messageIn = {sensorValueScalar.ToString()}");
+                                default:
+                                    break;
+                            }
+                            System.Diagnostics.Debug.WriteLine(logStr);
+                        }
                     }
-
-                    
                 };
 
                 timer.Elapsed += (s, a) =>
@@ -227,36 +201,38 @@ namespace SensorProcessorWpf.Models
                 };
 
 
-                //poller.RunAsync();
-                poller.Run();
+                poller.RunAsync();
 
-                //while (true)
-                //{
-                //    WaitHandle.WaitAny(
-                //    [
-                //        _cancellationToken.WaitHandle,
-                //        _workQueSignaler
-                //    ]);
+                while (!_cancellationToken.IsCancellationRequested)
+                {
+                    WaitHandle.WaitAny(
+                    [
+                        _cancellationToken.WaitHandle,
+                        _workQueSignaler
+                    ]);
 
-                //    // TODO: Start critical section
+                    lock (_workQueueLock)
+                    {
+                        WorkItem workItem;
+                        while (!_workQueue.IsEmpty)
+                        {
+                            // Todo check cancellation token and break out 
+                            if (_cancellationToken.IsCancellationRequested)
+                            {
+                                break;
+                            }
 
-                //    WorkItem workItem;
-                //    while (!_workQueue.IsEmpty)
-                //    {
-                //        // Todo check cancellation token and break out 
+                            if (_workQueue.TryDequeue(out workItem))
+                            {
+                                System.Diagnostics.Debug.WriteLine("ServiceBroker::run() - Sending Frame");
+                                clientSender.SendFrame(workItem.Data);
+                            }
+                        }
 
-                //        if (_workQueue.TryDequeue(out workItem))
-                //        {
-                //            System.Diagnostics.Debug.WriteLine("ServiceBroker::run() - Sending Frame");
-                //            clientSender.SendFrame(workItem.Data);
-                //        }
-                //    }
-
-                //    // Reset queue signals
-                //    _workQueSignaler.Reset();
-
-                //    // TODO: End critical section
-                //}
+                        // Reset queue signals
+                        _workQueSignaler.Reset();
+                    }
+                }
             }
         }
 

@@ -119,15 +119,30 @@ namespace SensorProcessorWpf.ViewModels
         {
             System.Diagnostics.Debug.WriteLine("LoginViewModel::LoginAsync");
 
-            UserCredentials result = await sessionService.Login(credentials.Value, 3000);
+            CoreServices.LoginResponse result = await sessionService.Login(credentials.Value, 3000);
 
-            if (result.Accepted)
+            switch (result.Result)
             {
-                return "Login Success!";
-            }
-            else
-            {
-                return "Login Failed!";
+                case CoreServices.LoginStatus.Unknown:
+                    return "Unknown Error occurred";
+
+                case CoreServices.LoginStatus.LoggedIn:
+                    return $"Login Success! session: {result.SessionId}";
+
+                case CoreServices.LoginStatus.LoggedOut:
+                    return "User is logged out";
+
+                case CoreServices.LoginStatus.Unauthorized:
+                    return "Invalid Credentials!";
+
+                case CoreServices.LoginStatus.TimedOut:
+                    return "The network connection timed out";
+
+                case CoreServices.LoginStatus.NetworkError:
+                    return "A network error has occurred";
+
+                default:
+                    return "Failed to send request. Contact support.";
             }
         }
     }

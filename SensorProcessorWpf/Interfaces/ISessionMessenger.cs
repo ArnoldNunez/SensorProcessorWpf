@@ -14,7 +14,7 @@ namespace SensorProcessorWpf.Interfaces
         /**
          * Event for when the login response is received.
          */
-        public event EventHandler<Person> LoginResponse;
+        public event EventHandler<CoreServices.LoginResponse> LoginResponse;
 
         #endregion
     }
