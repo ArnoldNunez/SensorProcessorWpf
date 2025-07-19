@@ -1,4 +1,17 @@
+# User Guide
+
+<p>Work In Progress</p>
+
+## UI Mockups
+![UI Mockup](./pictures/mockup_ui_startup_view.png)
+![UI Mockup](./pictures/mockup_ui_login_view.png)
+![UI Mockup](./pictures/mockup_ui_home_view.png)
+![UI Mockup](./pictures/mockup_ui_live_view.png)
+
+
 # Developer Guide
+
+<p>Work in Progress</p>
 
 ## Install protoc
 
